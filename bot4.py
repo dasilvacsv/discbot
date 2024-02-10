@@ -83,6 +83,13 @@ class Confirmacion(ui.View):
 
     @ui.button(label="Rechazar", style=ButtonStyle.red, emoji="❌")
     async def cancelar(self, button: ui.Button, interaction: Interaction):
+        timestamp_rechazo = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        async with aiosqlite.connect("usuarios.db") as db:
+            await db.execute(
+                "INSERT INTO SolicitudesRechazadas (NombreUsuario, UID, Rol, TimestampRegistro, TimestampRechazo) VALUES (?, ?, ?, ?, ?)",
+                (self.user.display_name, self.user.id, self.rol, self.timestamp_registro, timestamp_rechazo)
+            )
+            await db.commit()
         await interaction.response.send_message(f"Solicitud rechazada para {self.user.display_name}.", ephemeral=True)
         await interaction.message.delete()
 
