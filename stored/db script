@@ -1,0 +1,77 @@
+-- Usuarios
+CREATE TABLE IF NOT EXISTS Usuarios (
+    UserID INTEGER PRIMARY KEY AUTOINCREMENT,
+    NombreUsuario TEXT NOT NULL,
+    Rol TEXT NOT NULL,
+    InformacionContacto TEXT
+);
+
+-- Transacciones
+CREATE TABLE IF NOT EXISTS Transacciones (
+    TransaccionID INTEGER PRIMARY KEY AUTOINCREMENT,
+    Monto REAL NOT NULL,
+    MonedaOrigen TEXT NOT NULL,
+    MonedaDestino TEXT NOT NULL,
+    TasaCambioAplicada REAL NOT NULL,
+    PaisEmisorID INTEGER NOT NULL,
+    PaisReceptorID INTEGER NOT NULL,
+    CuentaEmisoraID INTEGER NOT NULL,
+    CuentaReceptoraID INTEGER NOT NULL,
+    UsuarioID INTEGER NOT NULL,
+    ClienteID INTEGER,
+    Estado TEXT NOT NULL,
+    FechaHora TEXT NOT NULL,
+    FOREIGN KEY (UsuarioID) REFERENCES Usuarios(UserID),
+    FOREIGN KEY (ClienteID) REFERENCES Usuarios(UserID)
+);
+
+-- Cotizaciones
+CREATE TABLE IF NOT EXISTS Cotizaciones (
+    CotizacionID INTEGER PRIMARY KEY AUTOINCREMENT,
+    MonedaOrigen TEXT NOT NULL,
+    MonedaDestino TEXT NOT NULL,
+    TasaCambio REAL NOT NULL,
+    FechaHora TEXT NOT NULL
+);
+
+-- Ganancias
+CREATE TABLE IF NOT EXISTS Ganancias (
+    GananciaID INTEGER PRIMARY KEY AUTOINCREMENT,
+    TransaccionID INTEGER NOT NULL,
+    Monto REAL NOT NULL,
+    UsuarioID INTEGER NOT NULL,
+    FechaHora TEXT NOT NULL,
+    FOREIGN KEY (TransaccionID) REFERENCES Transacciones(TransaccionID),
+    FOREIGN KEY (UsuarioID) REFERENCES Usuarios(UserID)
+);
+
+-- Países
+CREATE TABLE IF NOT EXISTS Paises (
+    PaisID INTEGER PRIMARY KEY AUTOINCREMENT,
+    NombrePais TEXT NOT NULL
+);
+
+-- Cuentas Bancarias
+CREATE TABLE IF NOT EXISTS CuentasBancarias (
+    CuentaID INTEGER PRIMARY KEY AUTOINCREMENT,
+    PaisID INTEGER NOT NULL,
+    UsuarioID INTEGER NOT NULL,
+    DetallesCuenta TEXT NOT NULL,
+    FOREIGN KEY (PaisID) REFERENCES Paises(PaisID),
+    FOREIGN KEY (UsuarioID) REFERENCES Usuarios(UserID)
+);
+
+-- Movimientos de Cuenta
+CREATE TABLE IF NOT EXISTS MovimientosCuenta (
+    MovimientoID INTEGER PRIMARY KEY AUTOINCREMENT,
+    CuentaID INTEGER NOT NULL,
+    TransaccionID INTEGER,
+    ValorAnterior REAL NOT NULL,
+    ValorAñadido REAL NOT NULL,
+    NuevoValor REAL NOT NULL,
+    FechaHora TEXT NOT NULL,
+    TipoMovimiento TEXT NOT NULL,
+    Descripcion TEXT,
+    FOREIGN KEY (CuentaID) REFERENCES CuentasBancarias(CuentaID),
+    FOREIGN KEY (TransaccionID) REFERENCES Transacciones(TransaccionID)
+);
